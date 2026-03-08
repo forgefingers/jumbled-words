@@ -35,4 +35,13 @@ def play():
                 d['id']=i['_id']
                 shuffled.append(d)
         return render_template('play.html',shuffled=shuffled)
+    if request.method=='POST':
+            print(request.form)
+            ids=[]
+            words=[]
+            for i, j in enumerate(request.form):
+                words.append(j)
+                d={"_id":ObjectId(i)}
+                ids.append(d)
+            correctwords=db.words.find(ids)
 app.run(debug=True)
