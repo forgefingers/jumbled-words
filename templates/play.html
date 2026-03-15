@@ -25,19 +25,19 @@
         <a href="/" type="button" class="btn btn-link text-white col-1">
             GO BACK
         </a>
+    </div>
     <form method="post">
-        </div>
         <div class="d-flex align-items-center flex-column">
                 {%for i in shuffled%}
                     <div class="card text-center m-2 bg-light">
                         <div class="card-body">
                             {{i['word']}}
                             <br>
-                            <input placeholder="Answer" name="{{i[id]}}" class="form-control">
+                            <input placeholder="Answer" name="{{i['_id']}}" class="form-control">
                         </div>
                     </div>
                 {%endfor%}
-                <button type="button" class="btn btn-danger col-1">
+                <button type="submit" class="btn btn-danger col-1">
                     Submit
                 </button>
         </div>

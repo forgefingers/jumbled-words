@@ -9,7 +9,7 @@ load_dotenv()
 uri = os.getenv("MONGO_URI")
 client = MongoClient(uri, server_api=ServerApi('1'))
 app=Flask('jumbledwords')
-app.config['SECRET_KEY']='7T#3px2w/l/0'
+app.config['SECRET_KEY']=os.getenv('SECRET_KEY')
 db=client.jumbled_words
 @app.route('/',methods=['GET','POST'])
 def index():
@@ -32,16 +32,28 @@ def play():
                 shuffledword=list(i['word'])
                 random.shuffle(shuffledword)
                 d['word']="".join(shuffledword)
-                d['id']=i['_id']
+                d['_id']=i['_id']
                 shuffled.append(d)
         return render_template('play.html',shuffled=shuffled)
     if request.method=='POST':
-            print(request.form)
-            ids=[]
-            words=[]
-            for i, j in enumerate(request.form):
-                words.append(j)
-                d={"_id":ObjectId(i)}
-                ids.append(d)
-            correctwords=db.words.find(ids)
+        print(request.form)
+        ids=[]
+        score=0
+        correctanswers=[]
+        useranswers=[]
+        for i, j in request.form.items():
+            objid=ObjectId(i)
+            ids.append({"_id":objid})
+        correctwords=list(db.words.find({"_id":{"$in":[obj["_id"] for obj in ids]}}))
+        correctdict={}
+        for doc in correctwords:
+                correctdict[doc["_id"]]=doc["word"]
+        for i, (j, k) in enumerate(request.form.items()):
+            objid=ObjectId(j)
+            correctword=correctdict.get(objid,"")
+            correctanswers.append(correctword)
+            useranswers.append(k)
+            if k.lower().strip()==correctword.lower().strip():
+                score+=1
+        return render_template('result.html',score=score, correctanswers=correctanswers, useranswers=useranswers)
 app.run(debug=True)
